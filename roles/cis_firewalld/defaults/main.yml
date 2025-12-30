@@ -1,0 +1,5 @@
+---
+# defaults file for roles/cis_firewalld
+cis_firewalld_zone: public
+cis_firewalld_allowed_services:
+  - ssh

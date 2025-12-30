@@ -1,0 +1,31 @@
+- name: CIS Precheck – RHEL 8 (Read-only)
+  hosts: cis_targets
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: SSH root login setting
+      command: sshd -T
+      register: sshd_out
+      changed_when: false
+
+    - name: Show SSH root login
+      debug:
+        msg: "{{ sshd_out.stdout_lines | select('search','permitrootlogin') | list }}"
+
+    - name: PAM password policy
+      command: grep PASS_MAX_DAYS /etc/login.defs
+      changed_when: false
+
+    - name: auditd rules count
+      shell: auditctl -l | wc -l
+      changed_when: false
+
+    - name: firewalld services
+      command: firewall-cmd --list-services
+      changed_when: false
+
+    - name: sysctl rp_filter
+      command: sysctl net.ipv4.conf.all.rp_filter
+      changed_when: false
+

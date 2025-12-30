@@ -1,0 +1,37 @@
+---
+# tasks file for roles/cis_ssh
+- name: Backup sshd_config
+  copy:
+    src: /etc/ssh/sshd_config
+    dest: /etc/ssh/sshd_config.cis.bak
+    remote_src: true
+    mode: '0600'
+
+- name: Set PermitRootLogin
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PermitRootLogin'
+    line: "PermitRootLogin {{ cis_ssh_permit_root_login }}"
+    create: yes
+  notify: restart sshd
+
+- name: Set MaxAuthTries
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^MaxAuthTries'
+    line: "MaxAuthTries {{ cis_ssh_max_auth_tries }}"
+  notify: restart sshd
+
+- name: Set ClientAliveInterval
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^ClientAliveInterval'
+    line: "ClientAliveInterval {{ cis_ssh_client_alive_interval }}"
+  notify: restart sshd
+
+- name: Set ClientAliveCountMax
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^ClientAliveCountMax'
+    line: "ClientAliveCountMax {{ cis_ssh_client_alive_count_max }}"
+  notify: restart sshd

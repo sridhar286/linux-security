@@ -1,0 +1,14 @@
+---
+# defaults file for roles/cis_pam
+# Password aging
+cis_pass_max_days: 90
+cis_pass_min_days: 7
+cis_pass_warn_age: 7
+
+# Password quality
+cis_pw_minlen: 14
+cis_pw_minclass: 4
+
+# Account lockout
+cis_faillock_deny: 5
+cis_faillock_unlock_time: 900

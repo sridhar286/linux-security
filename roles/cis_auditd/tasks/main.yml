@@ -1,0 +1,61 @@
+---
+# tasks file for roles/cis_auditd
+- name: Check if auditd is installed
+  command: rpm -q audit
+  register: audit_pkg
+  failed_when: false
+  changed_when: false
+
+- name: Install auditd if missing
+  package:
+    name: audit
+    state: present
+  when: audit_pkg.rc != 0
+
+- name: Enable and start auditd
+  service:
+    name: auditd
+    state: started
+    enabled: true
+  changed_when: false
+
+- name: Deploy CIS audit rules
+  copy:
+    src: cis.rules
+    dest: /etc/audit/rules.d/cis.rules
+    mode: '0640'
+
+- name: Load audit rules (RHEL 8 safe)
+  command: augenrules --load
+  register: augenrules_out
+  changed_when: false
+
+
+- name: Backup auditd.conf
+  copy:
+    src: /etc/audit/auditd.conf
+    dest: /etc/audit/auditd.conf.cis.bak
+    remote_src: true
+    mode: '0600'
+
+- name: Configure auditd.conf parameters
+  lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: "^{{ item.key }} ="
+    line: "{{ item.key }} = {{ item.value }}"
+  loop:
+    - { key: max_log_file, value: "{{ cis_auditd_max_log_file }}" }
+    - { key: max_log_file_action, value: "{{ cis_auditd_max_log_file_action }}" }
+    - { key: space_left_action, value: "{{ cis_auditd_space_left_action }}" }
+    - { key: action_mail_acct, value: "{{ cis_auditd_action_mail_acct }}" }
+    - { key: admin_space_left_action, value: "{{ cis_auditd_admin_space_left_action }}" }
+
+- name: Deploy CIS audit rules
+  copy:
+    src: cis.rules
+    dest: /etc/audit/rules.d/cis.rules
+    mode: '0640'
+
+- name: Reload audit rules
+  command: augenrules --load
+  changed_when: false

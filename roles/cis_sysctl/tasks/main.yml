@@ -1,0 +1,17 @@
+---
+# tasks file for roles/cis_sysctl
+- name: Backup sysctl.conf
+  copy:
+    src: /etc/sysctl.conf
+    dest: /etc/sysctl.conf.cis.bak
+    remote_src: true
+    mode: '0644'
+
+- name: Apply CIS sysctl settings
+  sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: yes
+  loop: "{{ cis_sysctl_settings | dict2items }}"
+

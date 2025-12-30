@@ -1,0 +1,35 @@
+# tasks file for roles/cis_cron
+---
+- name: Ensure cron is installed
+  package:
+    name: cronie
+    state: present
+
+- name: Create cron.allow
+  copy:
+    dest: /etc/cron.allow
+    content: |
+      root
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Remove cron.deny if present
+  file:
+    path: /etc/cron.deny
+    state: absent
+
+- name: Create at.allow
+  copy:
+    dest: /etc/at.allow
+    content: |
+      root
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Remove at.deny if present
+  file:
+    path: /etc/at.deny
+    state: absent
+

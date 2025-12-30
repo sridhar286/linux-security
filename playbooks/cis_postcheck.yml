@@ -1,0 +1,51 @@
+- name: CIS Postcheck – RHEL 8 (Validation)
+  hosts: cis_targets
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: SSH root login disabled
+      shell: sshd -T | grep -i permitrootlogin
+      changed_when: false
+      register: ssh_root
+
+    - name: Show SSH validation
+      debug:
+        msg: "{{ ssh_root.stdout }}"
+
+    - name: Password aging policy
+      shell: grep -E '^PASS_MAX_DAYS|^PASS_MIN_DAYS|^PASS_WARN_AGE' /etc/login.defs
+      changed_when: false
+      register: pam_policy
+
+    - name: Show PAM validation
+      debug:
+        msg: "{{ pam_policy.stdout_lines }}"
+
+    - name: auditd rules loaded
+      shell: auditctl -l | wc -l
+      changed_when: false
+      register: audit_rules
+
+    - name: Show auditd validation
+      debug:
+        msg: "Audit rules count: {{ audit_rules.stdout }}"
+
+    - name: firewalld default zone
+      command: firewall-cmd --get-default-zone
+      changed_when: false
+      register: fw_zone
+
+    - name: Show firewalld validation
+      debug:
+        msg: "Default zone: {{ fw_zone.stdout }}"
+
+    - name: sysctl rp_filter
+      command: sysctl net.ipv4.conf.all.rp_filter
+      changed_when: false
+      register: rp_filter
+
+    - name: Show sysctl validation
+      debug:
+        msg: "{{ rp_filter.stdout }}"
+

@@ -1,0 +1,7 @@
+---
+# defaults file for roles/cis_auditd
+cis_auditd_max_log_file: 50
+cis_auditd_max_log_file_action: keep_logs
+cis_auditd_space_left_action: email
+cis_auditd_action_mail_acct: root
+cis_auditd_admin_space_left_action: halt

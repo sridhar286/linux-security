@@ -1,0 +1,13 @@
+## Identity changes
+-w /etc/passwd -p wa -k identity
+-w /etc/group -p wa -k identity
+-w /etc/shadow -p wa -k identity
+-w /etc/gshadow -p wa -k identity
+
+## Sudo usage
+-w /etc/sudoers -p wa -k scope
+-w /etc/sudoers.d -p wa -k scope
+
+## Time changes
+-a always,exit -F arch=b64 -S adjtimex -S settimeofday -k time-change
+-a always,exit -F arch=b64 -S clock_settime -k time-change

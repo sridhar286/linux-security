@@ -1,0 +1,10 @@
+- name: CIS Hardening – RHEL 8
+  hosts: all
+  become: true
+  roles:
+    - { role: cis_ssh, tags: ssh }
+    - { role: cis_pam, tags: pam }
+    - { role: cis_auditd, tags: audit }
+    - { role: cis_firewalld, tags: firewall }
+    - { role: cis_sysctl, tags: sysctl }
+    - { role: cis_cron, tags: cron }

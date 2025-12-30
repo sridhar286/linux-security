@@ -1,0 +1,5 @@
+- name: CIS SSH Hardening
+  hosts: all
+  become: true
+  roles:
+    - cis_ssh

@@ -1,0 +1,59 @@
+---
+# tasks file for roles/cis_pam
+- name: Backup PAM and password files
+  copy:
+    src: "{{ item }}"
+    dest: "{{ item }}.cis.bak"
+    remote_src: true
+    mode: '0600'
+  loop:
+    - /etc/login.defs
+    - /etc/security/pwquality.conf
+    - /etc/pam.d/system-auth
+    - /etc/pam.d/password-auth
+
+# Password aging
+- name: Set password aging in login.defs
+  lineinfile:
+    path: /etc/login.defs
+    regexp: "^{{ item.key }}"
+    line: "{{ item.key }}   {{ item.value }}"
+  loop:
+    - { key: PASS_MAX_DAYS, value: "{{ cis_pass_max_days }}" }
+    - { key: PASS_MIN_DAYS, value: "{{ cis_pass_min_days }}" }
+    - { key: PASS_WARN_AGE, value: "{{ cis_pass_warn_age }}" }
+
+# Password complexity
+- name: Set pwquality rules
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: "^{{ item.key }}"
+    line: "{{ item.key }} = {{ item.value }}"
+    create: yes
+  loop:
+    - { key: minlen, value: "{{ cis_pw_minlen }}" }
+    - { key: minclass, value: "{{ cis_pw_minclass }}" }
+
+# Account lockout – PREAUTH
+- name: Configure PAM faillock preauth
+  lineinfile:
+    path: /etc/pam.d/system-auth
+    insertafter: '^auth.*pam_env.so'
+    line: "auth required pam_faillock.so preauth silent deny={{ cis_faillock_deny }} unlock_time={{ cis_faillock_unlock_time }}"
+    state: present
+
+# Account lockout – AUTHFAIL
+- name: Configure PAM faillock authfail
+  lineinfile:
+    path: /etc/pam.d/system-auth
+    insertafter: '^auth.*pam_faillock.so preauth'
+    line: "auth [default=die] pam_faillock.so authfail deny={{ cis_faillock_deny }} unlock_time={{ cis_faillock_unlock_time }}"
+    state: present
+
+# Account phase
+- name: Configure PAM faillock account
+  lineinfile:
+    path: /etc/pam.d/system-auth
+    regexp: '^account.*pam_faillock.so'
+    line: "account required pam_faillock.so"
+    state: present
