@@ -1,0 +1,13 @@
+# tasks file for roles/cis_user_defaults
+---
+- name: Set default inactive password lock
+  command: useradd -D -f 30
+  changed_when: false
+
+- name: Ensure default umask is set to 027
+  lineinfile:
+    path: /etc/login.defs
+    regexp: '^UMASK'
+    line: 'UMASK 027'
+    state: present
+

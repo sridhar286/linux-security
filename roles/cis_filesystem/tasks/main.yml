@@ -1,0 +1,26 @@
+# tasks file for roles/cis_filesystem
+---
+- name: Harden /tmp
+  mount:
+    path: /tmp
+    src: tmpfs
+    fstype: tmpfs
+    opts: nodev,nosuid,noexec
+    state: mounted
+
+- name: Bind mount /var/tmp to /tmp
+  mount:
+    path: /var/tmp
+    src: /tmp
+    fstype: none
+    opts: bind
+    state: mounted
+
+- name: Harden /dev/shm
+  mount:
+    path: /dev/shm
+    src: tmpfs
+    fstype: tmpfs
+    opts: nodev,nosuid,noexec
+    state: mounted
+

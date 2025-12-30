@@ -1,0 +1,14 @@
+# tasks file for roles/cis_kernel
+---
+- name: Disable unused filesystems
+  copy:
+    dest: /etc/modprobe.d/cis-blacklist.conf
+    content: |
+      install cramfs /bin/false
+      install squashfs /bin/false
+      install udf /bin/false
+      install usb-storage /bin/false
+    owner: root
+    group: root
+    mode: '0644'
+
